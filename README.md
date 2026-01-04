@@ -29,6 +29,37 @@ MEDC (Medical Image Codec) is an end-to-end compression system designed for CT/M
 
 ---
 
+## Quick Start (Recommended)
+
+Use the provided scripts to set up and run the project on a clean environment:
+
+```bash
+# 1. Setup environment (creates conda environment and installs dependencies)
+./setup.sh
+
+# 2. Activate environment
+conda activate medcodec
+
+# 3. Run all tests
+./run_tests.sh
+
+# 4. Run experiments
+./run_experiments.sh
+```
+
+Alternatively, use Makefile commands:
+
+```bash
+make setup      # Set up conda environment
+make test       # Run all checkpoint tests
+make experiment # Run compression experiments
+make demo       # Run a quick demo encode/decode
+make clean      # Clean temporary files
+make all        # Run everything (test + experiment)
+```
+
+---
+
 ## Environment Setup
 
 ### Requirements
@@ -298,6 +329,10 @@ Comparison of compression with and without DC coefficient differential coding:
 
 ```
 HW2/
+├── setup.sh                         # Environment setup script
+├── run_tests.sh                     # Run all checkpoint tests
+├── run_experiments.sh               # Run experiments
+├── Makefile                         # Make commands
 ├── encode.py                        # CLI encoder
 ├── decode.py                        # CLI decoder
 ├── requirements.txt                 # Python dependencies

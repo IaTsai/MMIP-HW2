@@ -2,3 +2,5 @@ numpy>=1.20.0
 pydicom>=2.3.0
 pylibjpeg>=2.0
 pylibjpeg-libjpeg>=2.1
+pillow>=9.0.0
+matplotlib>=3.5.0
