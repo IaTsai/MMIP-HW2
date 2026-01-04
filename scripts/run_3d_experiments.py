@@ -91,7 +91,7 @@ def run_gop_size_experiment(volume, quality=75):
 
     results = []
     for gop_size in [1, 5, 10, 20]:
-        compressed = encoder.encode(volume, quality=quality, gop_size=gop_size)
+        compressed = encoder.encode(volume, quality=quality, gop_size=gop_size, use_b_slices=False)
         recovered = decoder.decode(compressed)
         info = decoder.get_volume_info(compressed)
 
@@ -110,15 +110,48 @@ def run_gop_size_experiment(volume, quality=75):
     return results
 
 
+def run_b_slice_experiment(volume):
+    """Compare P-only vs I/P/B encoding at different quality levels."""
+    encoder = VolumeEncoder()
+    decoder = VolumeDecoder()
+
+    results = []
+    for quality in [50, 75, 85]:
+        # P-only encoding
+        comp_p = encoder.encode(volume, quality=quality, gop_size=6, use_b_slices=False)
+        info_p = decoder.get_volume_info(comp_p)
+
+        # I/P/B encoding
+        comp_b = encoder.encode(volume, quality=quality, gop_size=6, use_b_slices=True)
+        recovered_b = decoder.decode(comp_b)
+        info_b = decoder.get_volume_info(comp_b)
+
+        psnr = calculate_psnr(volume, recovered_b, bit_depth=16)
+        improvement = (1 - len(comp_b) / len(comp_p)) * 100
+
+        results.append({
+            'quality': quality,
+            'p_only_size': len(comp_p),
+            'ipb_size': len(comp_b),
+            'improvement_percent': improvement,
+            'psnr': psnr,
+            'i_slices': info_b['i_slices'],
+            'p_slices': info_b['p_slices'],
+            'b_slices': info_b.get('b_slices', 0),
+        })
+
+    return results
+
+
 def main():
     """Run all 3D extension experiments."""
     print("=" * 70)
-    print("3D VOLUME CODEC EXPERIMENTS")
+    print("3D VOLUME CODEC EXPERIMENTS (with B-slice)")
     print("=" * 70)
     print()
 
     # Create synthetic volume
-    print("[1/4] Creating synthetic CT volume...")
+    print("[1/5] Creating synthetic CT volume...")
     volume = create_synthetic_ct_volume(num_slices=20, height=128, width=128)
     print(f"      Volume shape: {volume.shape}")
     print(f"      Volume size: {volume.nbytes:,} bytes")
@@ -126,7 +159,7 @@ def main():
     print()
 
     # Experiment 1: 2D vs 3D at different quality levels
-    print("[2/4] Running 2D vs 3D comparison at different quality levels...")
+    print("[2/5] Running 2D vs 3D comparison at different quality levels...")
     print("-" * 70)
 
     comparison_results = []
@@ -142,7 +175,7 @@ def main():
         print()
 
     # Experiment 2: GOP size effect
-    print("[3/4] Running GOP size experiment...")
+    print("[3/5] Running GOP size experiment (P-only)...")
     print("-" * 70)
 
     gop_results = run_gop_size_experiment(volume, quality=75)
@@ -154,11 +187,25 @@ def main():
               f"{r['psnr']:>10.2f} {r['i_slices']:>10} {r['p_slices']:>10}")
     print()
 
+    # Experiment 3: B-slice comparison
+    print("[4/5] Running B-slice experiment (P-only vs I/P/B)...")
+    print("-" * 70)
+
+    b_slice_results = run_b_slice_experiment(volume)
+
+    print(f"  {'Quality':>7} {'P-only':>12} {'I/P/B':>12} {'Improve':>10} {'PSNR':>10} {'I/P/B':>10}")
+    print("  " + "-" * 65)
+    for r in b_slice_results:
+        print(f"  Q={r['quality']:2d}    {r['p_only_size']:>12,} {r['ipb_size']:>12,} "
+              f"{r['improvement_percent']:>9.2f}% {r['psnr']:>10.2f} "
+              f"{r['i_slices']}/{r['p_slices']}/{r['b_slices']}")
+    print()
+
     # Save results
-    print("[4/4] Saving results...")
+    print("[5/5] Saving results...")
 
     results = {
-        'experiment': '3D Volume Codec Extension',
+        'experiment': '3D Volume Codec Extension (with B-slice)',
         'volume_info': {
             'shape': list(volume.shape),
             'size_bytes': int(volume.nbytes),
@@ -166,6 +213,7 @@ def main():
         },
         '2d_vs_3d_comparison': comparison_results,
         'gop_size_experiment': gop_results,
+        'b_slice_experiment': b_slice_results,
     }
 
     os.makedirs('results', exist_ok=True)
@@ -181,15 +229,21 @@ def main():
     print("=" * 70)
 
     best_result = comparison_results[-1]  # Q=85
-    print(f"  At Q=85:")
-    print(f"    - 3D compression achieves {best_result['improvement_percent']:.1f}% better compression than 2D")
+    print(f"  2D vs 3D (at Q=85):")
+    print(f"    - 3D compression achieves {best_result['improvement_percent']:.1f}% better than 2D")
     print(f"    - Compression ratio: {best_result['compression_ratio_3d']:.2f}x (vs 2D: {best_result['compression_ratio_2d']:.2f}x)")
-    print(f"    - PSNR: {best_result['psnr_3d']:.2f} dB")
     print()
-    print("  GOP Size Effect:")
+    print("  GOP Size Effect (P-only):")
     print(f"    - GOP=1 (all I-slices): {gop_results[0]['size']:,} bytes")
     print(f"    - GOP=20 (mostly P-slices): {gop_results[-1]['size']:,} bytes")
     print(f"    - Savings: {(1 - gop_results[-1]['size']/gop_results[0]['size'])*100:.1f}%")
+    print()
+    print("  B-slice Improvement (at Q=85):")
+    best_b = b_slice_results[-1]
+    print(f"    - P-only: {best_b['p_only_size']:,} bytes")
+    print(f"    - I/P/B:  {best_b['ipb_size']:,} bytes")
+    print(f"    - B-slice improvement: {best_b['improvement_percent']:.1f}%")
+    print(f"    - Slice distribution: I={best_b['i_slices']}, P={best_b['p_slices']}, B={best_b['b_slices']}")
     print()
     print("=" * 70)
 

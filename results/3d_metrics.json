@@ -1,5 +1,5 @@
 {
-  "experiment": "3D Volume Codec Extension",
+  "experiment": "3D Volume Codec Extension (with B-slice)",
   "volume_info": {
     "shape": [
       20,
@@ -13,92 +13,124 @@
     {
       "quality": 25,
       "2d_size": 2500,
-      "3d_size": 2527,
-      "improvement_percent": -1.079999999999992,
+      "3d_size": 2582,
+      "improvement_percent": -3.279999999999994,
       "compression_ratio_2d": 262.144,
-      "compression_ratio_3d": 259.34309457855164,
+      "compression_ratio_3d": 253.81874515879164,
       "bpp_2d": 0.06103515625,
-      "bpp_3d": 0.0616943359375,
-      "psnr_3d": 45.902486903388784,
-      "rmse_3d": 332.16124419440536,
+      "bpp_3d": 0.063037109375,
+      "psnr_3d": 45.892349971666626,
+      "rmse_3d": 332.5491217239568,
       "i_slices": 2,
-      "p_slices": 18
+      "p_slices": 6
     },
     {
       "quality": 50,
       "2d_size": 2640,
-      "3d_size": 2588,
-      "improvement_percent": 1.9696969696969657,
+      "3d_size": 2575,
+      "improvement_percent": 2.4621212121212155,
       "compression_ratio_2d": 248.24242424242425,
-      "compression_ratio_3d": 253.23029366306028,
+      "compression_ratio_3d": 254.50873786407766,
       "bpp_2d": 0.064453125,
-      "bpp_3d": 0.06318359375,
-      "psnr_3d": 46.549845408905895,
-      "rmse_3d": 308.30533029883514,
+      "bpp_3d": 0.0628662109375,
+      "psnr_3d": 46.645033844165845,
+      "rmse_3d": 304.9450664741021,
       "i_slices": 2,
-      "p_slices": 18
+      "p_slices": 6
     },
     {
       "quality": 75,
       "2d_size": 7304,
-      "3d_size": 4563,
-      "improvement_percent": 37.52738225629791,
+      "3d_size": 4205,
+      "improvement_percent": 42.42880613362541,
       "compression_ratio_2d": 89.72617743702081,
-      "compression_ratio_3d": 143.62480824019286,
+      "compression_ratio_3d": 155.85255648038049,
       "bpp_2d": 0.1783203125,
-      "bpp_3d": 0.1114013671875,
-      "psnr_3d": 46.85874050807571,
-      "rmse_3d": 297.5337790409858,
+      "bpp_3d": 0.1026611328125,
+      "psnr_3d": 46.91131561674144,
+      "rmse_3d": 295.73826652977976,
       "i_slices": 2,
-      "p_slices": 18
+      "p_slices": 6
     },
     {
       "quality": 85,
       "2d_size": 29815,
-      "3d_size": 10768,
-      "improvement_percent": 63.883951031360056,
+      "3d_size": 9992,
+      "improvement_percent": 66.48666778467214,
       "compression_ratio_2d": 21.980882106322323,
-      "compression_ratio_3d": 60.861812778603266,
+      "compression_ratio_3d": 65.58847077662129,
       "bpp_2d": 0.7279052734375,
-      "bpp_3d": 0.262890625,
-      "psnr_3d": 48.21430416271508,
-      "rmse_3d": 254.54120493980346,
+      "bpp_3d": 0.2439453125,
+      "psnr_3d": 48.28463697751572,
+      "rmse_3d": 252.48841432486785,
       "i_slices": 2,
-      "p_slices": 18
+      "p_slices": 6
     }
   ],
   "gop_size_experiment": [
     {
       "gop_size": 1,
-      "size": 7504,
-      "compression_ratio": 87.33475479744136,
+      "size": 7545,
+      "compression_ratio": 86.86017229953612,
       "psnr": 46.90530755141981,
       "i_slices": 20,
       "p_slices": 0
     },
     {
       "gop_size": 5,
-      "size": 4911,
-      "compression_ratio": 133.44736306251272,
+      "size": 4952,
+      "compression_ratio": 132.34248788368336,
       "psnr": 46.893495033359216,
       "i_slices": 4,
       "p_slices": 16
     },
     {
       "gop_size": 10,
-      "size": 4563,
-      "compression_ratio": 143.62480824019286,
+      "size": 4604,
+      "compression_ratio": 142.34578627280627,
       "psnr": 46.85874050807571,
       "i_slices": 2,
       "p_slices": 18
     },
     {
       "gop_size": 20,
-      "size": 4427,
-      "compression_ratio": 148.0370454032076,
+      "size": 4468,
+      "compression_ratio": 146.67860340196955,
       "psnr": 46.82990486296197,
       "i_slices": 1,
       "p_slices": 19
+    }
+  ],
+  "b_slice_experiment": [
+    {
+      "quality": 50,
+      "p_only_size": 2609,
+      "ipb_size": 2609,
+      "improvement_percent": 0.0,
+      "psnr": 46.67201009765595,
+      "i_slices": 4,
+      "p_slices": 6,
+      "b_slices": 10
+    },
+    {
+      "quality": 75,
+      "p_only_size": 4909,
+      "ipb_size": 4533,
+      "improvement_percent": 7.659401100020369,
+      "psnr": 46.918970061659024,
+      "i_slices": 4,
+      "p_slices": 6,
+      "b_slices": 10
+    },
+    {
+      "quality": 85,
+      "p_only_size": 12988,
+      "ipb_size": 12153,
+      "improvement_percent": 6.429011395133966,
+      "psnr": 48.29527653469255,
+      "i_slices": 4,
+      "p_slices": 6,
+      "b_slices": 10
     }
   ]
 }
