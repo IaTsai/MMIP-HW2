@@ -38,12 +38,17 @@ fi
 # Create results directory
 mkdir -p results/images
 
-echo "[1/3] Running main experiment suite"
+echo "[1/4] Running main experiment suite (2D)"
 echo "--------------------------------------------------------------"
 python scripts/run_experiments.py
 
 echo ""
-echo "[2/3] Generating report figures"
+echo "[2/4] Running 3D extension experiments"
+echo "--------------------------------------------------------------"
+python scripts/run_3d_experiments.py
+
+echo ""
+echo "[3/4] Generating report figures"
 echo "--------------------------------------------------------------"
 if [ -d "report" ]; then
     cd report
@@ -52,7 +57,7 @@ if [ -d "report" ]; then
 fi
 
 echo ""
-echo "[3/3] Displaying results"
+echo "[4/4] Displaying results"
 echo "--------------------------------------------------------------"
 
 if [ -f "results/metrics.json" ]; then

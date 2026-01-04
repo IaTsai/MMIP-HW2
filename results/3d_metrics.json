@@ -1,0 +1,104 @@
+{
+  "experiment": "3D Volume Codec Extension",
+  "volume_info": {
+    "shape": [
+      20,
+      128,
+      128
+    ],
+    "size_bytes": 655360,
+    "dtype": "int16"
+  },
+  "2d_vs_3d_comparison": [
+    {
+      "quality": 25,
+      "2d_size": 2500,
+      "3d_size": 2527,
+      "improvement_percent": -1.079999999999992,
+      "compression_ratio_2d": 262.144,
+      "compression_ratio_3d": 259.34309457855164,
+      "bpp_2d": 0.06103515625,
+      "bpp_3d": 0.0616943359375,
+      "psnr_3d": 45.902486903388784,
+      "rmse_3d": 332.16124419440536,
+      "i_slices": 2,
+      "p_slices": 18
+    },
+    {
+      "quality": 50,
+      "2d_size": 2640,
+      "3d_size": 2588,
+      "improvement_percent": 1.9696969696969657,
+      "compression_ratio_2d": 248.24242424242425,
+      "compression_ratio_3d": 253.23029366306028,
+      "bpp_2d": 0.064453125,
+      "bpp_3d": 0.06318359375,
+      "psnr_3d": 46.549845408905895,
+      "rmse_3d": 308.30533029883514,
+      "i_slices": 2,
+      "p_slices": 18
+    },
+    {
+      "quality": 75,
+      "2d_size": 7304,
+      "3d_size": 4563,
+      "improvement_percent": 37.52738225629791,
+      "compression_ratio_2d": 89.72617743702081,
+      "compression_ratio_3d": 143.62480824019286,
+      "bpp_2d": 0.1783203125,
+      "bpp_3d": 0.1114013671875,
+      "psnr_3d": 46.85874050807571,
+      "rmse_3d": 297.5337790409858,
+      "i_slices": 2,
+      "p_slices": 18
+    },
+    {
+      "quality": 85,
+      "2d_size": 29815,
+      "3d_size": 10768,
+      "improvement_percent": 63.883951031360056,
+      "compression_ratio_2d": 21.980882106322323,
+      "compression_ratio_3d": 60.861812778603266,
+      "bpp_2d": 0.7279052734375,
+      "bpp_3d": 0.262890625,
+      "psnr_3d": 48.21430416271508,
+      "rmse_3d": 254.54120493980346,
+      "i_slices": 2,
+      "p_slices": 18
+    }
+  ],
+  "gop_size_experiment": [
+    {
+      "gop_size": 1,
+      "size": 7504,
+      "compression_ratio": 87.33475479744136,
+      "psnr": 46.90530755141981,
+      "i_slices": 20,
+      "p_slices": 0
+    },
+    {
+      "gop_size": 5,
+      "size": 4911,
+      "compression_ratio": 133.44736306251272,
+      "psnr": 46.893495033359216,
+      "i_slices": 4,
+      "p_slices": 16
+    },
+    {
+      "gop_size": 10,
+      "size": 4563,
+      "compression_ratio": 143.62480824019286,
+      "psnr": 46.85874050807571,
+      "i_slices": 2,
+      "p_slices": 18
+    },
+    {
+      "gop_size": 20,
+      "size": 4427,
+      "compression_ratio": 148.0370454032076,
+      "psnr": 46.82990486296197,
+      "i_slices": 1,
+      "p_slices": 19
+    }
+  ]
+}

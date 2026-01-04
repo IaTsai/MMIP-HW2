@@ -356,7 +356,8 @@ HW2/
 │   │   └── zigzag.py
 │   ├── codec/                       # Encoder/Decoder
 │   │   ├── encoder.py
-│   │   └── decoder.py
+│   │   ├── decoder.py
+│   │   └── volume_codec.py          # 3D volume codec (Extra Credit)
 │   └── metrics/                     # Quality metrics
 │       └── quality.py
 ├── tests/                           # Checkpoint tests
@@ -400,11 +401,74 @@ HW2/
 
 ---
 
+## 3D Volume Extension (Extra Credit)
+
+The codec includes a 3D extension that exploits inter-slice redundancy in CT/MR volumes for improved compression.
+
+### 3D Compression Strategy
+
+```
+              I-slice    P-slice    P-slice    P-slice    ...    I-slice
+              (full)    (residual) (residual) (residual)        (full)
+Slice 0  ->  Slice 1  ->  Slice 2  ->  Slice 3  -> ... ->  Slice N
+   |            |            |            |                    |
+   v            v            v            v                    v
+Independent  Diff from   Diff from   Diff from           Independent
+  encode      Slice 0     Slice 1     Slice 2              encode
+```
+
+- **I-slice (Intra)**: Encoded independently (like 2D)
+- **P-slice (Predictive)**: Encodes residual (current - previous reconstructed)
+- **GOP Size**: Controls I-slice frequency for random access
+
+### 3D Usage
+
+```python
+from medcodec.codec import VolumeEncoder, VolumeDecoder
+
+# Encode a 3D volume (slices, height, width)
+encoder = VolumeEncoder()
+compressed = encoder.encode(volume, quality=75, gop_size=10)
+
+# Decode
+decoder = VolumeDecoder()
+recovered = decoder.decode(compressed)
+
+# Get volume info
+info = decoder.get_volume_info(compressed)
+print(f"I-slices: {info['i_slices']}, P-slices: {info['p_slices']}")
+```
+
+### 3D Compression Results
+
+Experiments on synthetic CT volume (20 slices, 128x128):
+
+| Quality | 2D Size | 3D Size | Improvement | PSNR |
+|---------|---------|---------|-------------|------|
+| 25 | 2,500 B | 2,527 B | -1.1% | 45.90 dB |
+| 50 | 2,640 B | 2,588 B | +2.0% | 46.55 dB |
+| 75 | 7,304 B | 4,563 B | +37.5% | 46.86 dB |
+| 85 | 29,815 B | 10,768 B | +63.9% | 48.21 dB |
+
+**Key Finding**: At higher quality levels, 3D compression achieves up to 64% better compression than independent 2D encoding.
+
+### GOP Size Effect
+
+| GOP | Size | Compression Ratio | PSNR |
+|-----|------|-------------------|------|
+| 1 (all I) | 7,504 B | 87.3x | 46.91 dB |
+| 5 | 4,911 B | 133.5x | 46.89 dB |
+| 10 | 4,563 B | 143.6x | 46.86 dB |
+| 20 (mostly P) | 4,427 B | 148.0x | 46.83 dB |
+
+Larger GOP sizes provide better compression but reduce random access capability.
+
+---
+
 ## Limitations
 
-1. **2D Only**: No inter-slice prediction for 3D volumes
-2. **Fixed Block Size**: Only 8x8 blocks supported
-3. **No ROI Support**: Uniform quality across entire image
-4. **Dynamic Huffman**: Tables stored per-file (overhead for small images)
+1. **Fixed Block Size**: Only 8x8 blocks supported
+2. **No ROI Support**: Uniform quality across entire image
+3. **Dynamic Huffman**: Tables stored per-file (overhead for small images)
 
 ---

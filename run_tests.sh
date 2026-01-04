@@ -53,6 +53,9 @@ run_test "Checkpoint 5: Full Codec" "tests/test_checkpoint_5.py"
 run_test "Checkpoint 6: CLI Interface" "tests/test_checkpoint_6.py"
 run_test "Checkpoint 7: Evaluation Metrics" "tests/test_checkpoint_7.py"
 
+# Run 3D extension tests (Extra Credit)
+run_test "3D Extension: Volume Codec" "tests/test_3d_extension.py"
+
 # Summary
 echo "============================================================"
 echo "TEST SUMMARY"
