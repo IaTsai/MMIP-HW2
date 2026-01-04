@@ -1,0 +1,106 @@
+{
+  "experiment_date": "2025-12-29T16:37:27.756928",
+  "dataset": {
+    "name": "Medimodel Human Skull 2",
+    "source_url": "https://medimodel.com/sample-dicom-files/",
+    "file": "data/2_skull_ct/DICOM/I0"
+  },
+  "image_info": {
+    "shape": [
+      367,
+      835
+    ],
+    "dtype": "int16",
+    "min_value": -464,
+    "max_value": 602,
+    "original_bytes": 612890
+  },
+  "codec_info": {
+    "block_size": 8,
+    "transform": "DCT (matrix multiplication)",
+    "quantization": "Uniform (16-bit adapted)",
+    "entropy_coding": "Huffman with DC DPCM + AC RLE"
+  },
+  "rate_distortion_results": [
+    {
+      "quality": 25,
+      "rmse": 312.3565,
+      "psnr": 46.44,
+      "bpp": 0.0329,
+      "compression_ratio": 486.81,
+      "compressed_bytes": 1259,
+      "original_bytes": 612890,
+      "max_error": 605,
+      "mean_error": 291.47
+    },
+    {
+      "quality": 50,
+      "rmse": 91.8146,
+      "psnr": 57.07,
+      "bpp": 0.034,
+      "compression_ratio": 471.09,
+      "compressed_bytes": 1301,
+      "original_bytes": 612890,
+      "max_error": 502,
+      "mean_error": 77.21
+    },
+    {
+      "quality": 85,
+      "rmse": 43.0589,
+      "psnr": 63.65,
+      "bpp": 0.0403,
+      "compression_ratio": 396.95,
+      "compressed_bytes": 1544,
+      "original_bytes": 612890,
+      "max_error": 400,
+      "mean_error": 37.83
+    }
+  ],
+  "ablation_study": {
+    "description": "Comparison of compression with and without DC DPCM",
+    "results": [
+      {
+        "quality": 25,
+        "with_dpcm": {
+          "bpp": 0.0329,
+          "psnr": 46.44,
+          "compressed_bytes": 1259
+        },
+        "without_dpcm": {
+          "bpp": 0.1272,
+          "psnr": 46.44,
+          "compressed_bytes": 4874
+        },
+        "dpcm_savings_percent": 74.17
+      },
+      {
+        "quality": 50,
+        "with_dpcm": {
+          "bpp": 0.034,
+          "psnr": 57.07,
+          "compressed_bytes": 1301
+        },
+        "without_dpcm": {
+          "bpp": 0.143,
+          "psnr": 57.07,
+          "compressed_bytes": 5478
+        },
+        "dpcm_savings_percent": 76.25
+      },
+      {
+        "quality": 85,
+        "with_dpcm": {
+          "bpp": 0.0403,
+          "psnr": 63.65,
+          "compressed_bytes": 1544
+        },
+        "without_dpcm": {
+          "bpp": 0.1779,
+          "psnr": 63.65,
+          "compressed_bytes": 6815
+        },
+        "dpcm_savings_percent": 77.34
+      }
+    ]
+  }
+}
