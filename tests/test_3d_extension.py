@@ -311,10 +311,108 @@ def test_real_dicom_volume():
         return False
 
 
+def test_b_slices():
+    """Test B-slice (bidirectional prediction) compression."""
+    print("\n" + "=" * 60)
+    print("Test 6: B-Slice Compression (Bidirectional Prediction)")
+    print("=" * 60)
+
+    try:
+        volume = create_synthetic_volume(num_slices=12, height=64, width=64)
+        print(f"   Volume: {volume.shape}")
+
+        encoder = VolumeEncoder()
+        decoder = VolumeDecoder()
+
+        # Compare P-only vs I/P/B
+        print("\n   Comparing P-only vs I/P/B encoding:")
+        print("   " + "-" * 50)
+
+        results = []
+        for use_b in [False, True]:
+            compressed = encoder.encode(volume, quality=75, gop_size=6, use_b_slices=use_b)
+            recovered = decoder.decode(compressed)
+            info = decoder.get_volume_info(compressed)
+
+            psnr = calculate_psnr(volume, recovered, bit_depth=16)
+            mode = "I/P/B" if use_b else "I/P only"
+
+            results.append({
+                'mode': mode,
+                'size': len(compressed),
+                'psnr': psnr,
+                'i': info['i_slices'],
+                'p': info['p_slices'],
+                'b': info.get('b_slices', 0)
+            })
+
+            print(f"   {mode:10}: {len(compressed):,} bytes, "
+                  f"I={info['i_slices']}, P={info['p_slices']}, B={info.get('b_slices', 0)}, "
+                  f"PSNR={psnr:.2f} dB")
+
+        # Calculate improvement
+        p_only_size = results[0]['size']
+        ipb_size = results[1]['size']
+        improvement = (1 - ipb_size / p_only_size) * 100
+
+        print(f"\n   B-slice improvement: {improvement:.2f}%")
+
+        # Verify B-slices were used
+        assert results[1]['b'] > 0, "No B-slices were generated"
+
+        print("\n   [PASS] B-slice test passed")
+        return True, improvement
+
+    except Exception as e:
+        print(f"   [FAIL] B-slice test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False, 0
+
+
+def test_b_slice_quality():
+    """Test B-slice compression at different quality levels."""
+    print("\n" + "=" * 60)
+    print("Test 7: B-Slice Quality Comparison")
+    print("=" * 60)
+
+    try:
+        volume = create_synthetic_volume(num_slices=12, height=64, width=64)
+        print(f"   Volume: {volume.shape}")
+
+        encoder = VolumeEncoder()
+        decoder = VolumeDecoder()
+
+        print("\n   Quality | P-only Size | I/P/B Size | Improvement | PSNR")
+        print("   " + "-" * 60)
+
+        for quality in [50, 75, 85]:
+            # P-only
+            comp_p = encoder.encode(volume, quality=quality, gop_size=6, use_b_slices=False)
+            # I/P/B
+            comp_b = encoder.encode(volume, quality=quality, gop_size=6, use_b_slices=True)
+            recovered = decoder.decode(comp_b)
+
+            psnr = calculate_psnr(volume, recovered, bit_depth=16)
+            improvement = (1 - len(comp_b) / len(comp_p)) * 100
+
+            print(f"   Q={quality:2d}    | {len(comp_p):>11,} | {len(comp_b):>10,} | "
+                  f"{improvement:>10.2f}% | {psnr:.2f} dB")
+
+        print("\n   [PASS] B-slice quality test passed")
+        return True
+
+    except Exception as e:
+        print(f"   [FAIL] B-slice quality test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
 def main():
     """Run all 3D extension tests."""
     print("\n" + "=" * 60)
-    print("3D VOLUME CODEC EXTENSION TESTS")
+    print("3D VOLUME CODEC EXTENSION TESTS (with B-slice)")
     print("=" * 60 + "\n")
 
     results = []
@@ -334,6 +432,13 @@ def main():
 
     # Test 5: Real DICOM
     results.append(("Real DICOM Volume", test_real_dicom_volume()))
+
+    # Test 6: B-slice compression
+    passed, improvement = test_b_slices()
+    results.append(("B-Slice Compression", passed))
+
+    # Test 7: B-slice quality
+    results.append(("B-Slice Quality", test_b_slice_quality()))
 
     # Summary
     print("\n" + "=" * 60)

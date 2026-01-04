@@ -407,18 +407,26 @@ The codec includes a 3D extension that exploits inter-slice redundancy in CT/MR 
 
 ### 3D Compression Strategy
 
+The codec supports three slice types similar to video compression (H.264/HEVC):
+
 ```
-              I-slice    P-slice    P-slice    P-slice    ...    I-slice
-              (full)    (residual) (residual) (residual)        (full)
-Slice 0  ->  Slice 1  ->  Slice 2  ->  Slice 3  -> ... ->  Slice N
-   |            |            |            |                    |
-   v            v            v            v                    v
-Independent  Diff from   Diff from   Diff from           Independent
-  encode      Slice 0     Slice 1     Slice 2              encode
+GOP Structure (gop_size=6):
+
+  Display:   I     B     B     P     B     B     I    ...
+  Index:     0     1     2     3     4     5     6    ...
+             |     |     |     |     |     |     |
+             v     v     v     v     v     v     v
+          Encode  Bi-   Bi-  Forward Bi-  Bi-  Encode
+          direct  dir   dir  pred   dir  dir  direct
+
+B-slice Prediction:
+  prediction = (prev_reference + next_reference) / 2
+  residual = current_slice - prediction
 ```
 
-- **I-slice (Intra)**: Encoded independently (like 2D)
-- **P-slice (Predictive)**: Encodes residual (current - previous reconstructed)
+- **I-slice (Intra)**: Encoded independently (reference frame)
+- **P-slice (Predictive)**: Forward prediction from previous reference
+- **B-slice (Bidirectional)**: Prediction from both previous AND next reference (best compression)
 - **GOP Size**: Controls I-slice frequency for random access
 
 ### 3D Usage
@@ -426,17 +434,21 @@ Independent  Diff from   Diff from   Diff from           Independent
 ```python
 from medcodec.codec import VolumeEncoder, VolumeDecoder
 
-# Encode a 3D volume (slices, height, width)
 encoder = VolumeEncoder()
-compressed = encoder.encode(volume, quality=75, gop_size=10)
+decoder = VolumeDecoder()
+
+# Encode with B-slices (default, best compression)
+compressed = encoder.encode(volume, quality=75, gop_size=10, use_b_slices=True)
+
+# Encode with P-slices only (faster, compatible with v1)
+compressed = encoder.encode(volume, quality=75, gop_size=10, use_b_slices=False)
 
 # Decode
-decoder = VolumeDecoder()
 recovered = decoder.decode(compressed)
 
 # Get volume info
 info = decoder.get_volume_info(compressed)
-print(f"I-slices: {info['i_slices']}, P-slices: {info['p_slices']}")
+print(f"I={info['i_slices']}, P={info['p_slices']}, B={info['b_slices']}")
 ```
 
 ### 3D Compression Results
@@ -462,6 +474,18 @@ Experiments on synthetic CT volume (20 slices, 128x128):
 | 20 (mostly P) | 4,427 B | 148.0x | 46.83 dB |
 
 Larger GOP sizes provide better compression but reduce random access capability.
+
+### B-Slice vs P-Slice Comparison
+
+B-slices use bidirectional prediction for additional compression gains:
+
+| Quality | P-only Size | I/P/B Size | B-slice Improvement |
+|---------|-------------|------------|---------------------|
+| 50 | 1,001 B | 994 B | +0.7% |
+| 75 | 1,704 B | 1,621 B | +4.9% |
+| 85 | 3,795 B | 3,476 B | +8.4% |
+
+**Key Finding**: B-slices provide up to 8.4% additional compression over P-only encoding at high quality settings. Combined with inter-slice prediction, the total 3D improvement reaches **70%+ over 2D encoding**.
 
 ---
 
